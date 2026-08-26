@@ -1,4 +1,3 @@
-Aqui está uma estrutura de README elaborada especificamente para destacar suas habilidades em Engenharia de Dados, modelagem e boas práticas, chamando a atenção de tech leads e recrutadores.
 
 🏗️ Construção de Data Warehouse: Despesas Públicas
 Este projeto demonstra a construção ponta a ponta de um Data Warehouse utilizando SQL Server (T-SQL), aplicando o conceito de Arquitetura Medalhão (Bronze, Silver e Gold) e a modelagem dimensional Star Schema.
