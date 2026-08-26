@@ -1,55 +1,51 @@
 
-🏗️ Construção de Data Warehouse: Despesas Públicas
-Este projeto demonstra a construção ponta a ponta de um Data Warehouse utilizando SQL Server (T-SQL), aplicando o conceito de Arquitetura Medalhão (Bronze, Silver e Gold) e a modelagem dimensional Star Schema.
+# 🏗️ Construção de Data Warehouse: Despesas Públicas
 
-O objetivo do projeto é ingerir dados brutos de despesas públicas oriundos de arquivos CSV, transformá-los e disponibilizá-los em uma estrutura otimizada para consultas analíticas e geração de insights (Business Intelligence).
+Este projeto demonstra a construção ponta a ponta de um **Data Warehouse** utilizando **SQL Server (T-SQL)**. O pipeline aplica os conceitos da **Arquitetura Medalhão** (Bronze, Silver e Gold) e a modelagem dimensional **Star Schema**.
 
-🚀 Tecnologias e Habilidades Demonstradas
-Linguagem: SQL Server / T-SQL
+O objetivo principal é ingerir dados brutos de despesas públicas a partir de arquivos CSV, transformá-los e disponibilizá-los em uma estrutura otimizada para consultas analíticas e geração de insights (Business Intelligence).
 
-Engenharia de Dados: Processos de ETL/ELT, Bulk Insert, Merge (Upsert)
+## 🚀 Tecnologias e Habilidades Demonstradas
 
-Arquitetura de Dados: Arquitetura Medalhão (Bronze, Silver, Gold)
+- **Linguagem:** SQL Server / T-SQL
+- **Engenharia de Dados:** Processos de ETL/ELT, Bulk Insert, Merge (Upsert)
+- **Arquitetura de Dados:** Arquitetura Medalhão (Bronze, Silver, Gold)
+- **Modelagem de Dados:** Star Schema (Tabelas Fato e Dimensão)
+- **Governança e Auditoria:** Criação de rotinas de Log e tratamento de erros (`TRY...CATCH`)
+- **Análise de Dados:** Agregações complexas, CTEs e cálculos de variação MoM (Month-over-Month)
 
-Modelagem de Dados: Star Schema (Tabelas Fato e Dimensão)
+## 🏛️ Arquitetura do Projeto
 
-Governança e Auditoria: Criação de rotinas de Log e tratamento de erros (Try/Catch)
+O pipeline de dados foi desenhado para garantir a qualidade, rastreabilidade e performance dos dados, estruturado nas seguintes camadas:
 
-Análise de Dados: Agregações complexas, CTEs, e cálculos de variação MoM (Month-over-Month)
+- **Camada Bronze (Raw Data):** Ingestão dos dados brutos diretamente de arquivos CSV via `BULK INSERT` para tabelas sem tratamento rigoroso, garantindo a preservação do dado original.
+- **Camada Silver (Cleansed Data):** Refinamento dos dados e criação das Tabelas Dimensão (`D_Orgao_Superior`, `D_Orgao_Subordinado`, `D_Unidade_Gestora`, `D_Gestao`, `D_Grupo_Despesa` e `D_Tempo`).
+- **Camada Gold (Curated Data):** Construção da Tabela Fato (`FATO_DESPESA`). O carregamento utiliza a instrução `MERGE` para realizar *Upserts* seguros, garantindo a atualização de registros existentes e a inserção de novos sem duplicidade.
+- **Camada de Log (Auditoria):** Implementação de uma tabela `LOG_CARGAS` que registra o histórico das execuções, gravando o sucesso ou os detalhes do erro através de blocos `BEGIN TRY... CATCH` e controle transacional (`BEGIN TRANSACTION / COMMIT / ROLLBACK`).
 
-🏛️ Arquitetura do Projeto
-O pipeline de dados foi desenhado para garantir a qualidade, rastreabilidade e performance dos dados, dividido nas seguintes camadas:
+## 📊 Insights e Consultas Analíticas (Business Questions)
 
-Camada Bronze (Raw Data): Ingestão dos dados brutos diretamente de arquivos CSV (BULK INSERT) para tabelas sem tratamento rigoroso, garantindo a preservação do dado original.
+Com a camada Gold estabelecida, o projeto responde a perguntas cruciais de negócios:
 
-Camada Silver (Cleansed Data): Refinamento dos dados e criação das Tabelas Dimensão (D_Orgao_Superior, D_Orgao_Subordinado, D_Unidade_Gestora, D_Gestao, D_Grupo_Despesa e D_Tempo).
+- Quais são os Top 10 Órgãos Superiores com maior valor pago em um mês específico?
+- Qual é o valor total empenhado consolidado por Gestão no trimestre?
+- Qual é a **Variação Percentual (MoM)** do valor empenhado de um mês para o outro por Unidade Gestora?
 
-Camada Gold (Curated Data): Construção da Tabela Fato (FATO_DESPESA). O carregamento desta camada utiliza a instrução MERGE para realizar Upserts seguros, garantindo que registros existentes sejam atualizados e novos sejam inseridos sem duplicidade.
+## 💡 Destaques do Código
 
-Camada de Log (Auditoria): Implementação de uma tabela LOG_CARGAS que registra o histórico das execuções, gravando o sucesso ou os detalhes do erro (número, severidade, linha) através de blocos BEGIN TRY... CATCH e controle transacional (BEGIN TRANSACTION / COMMIT / ROLLBACK).
+- **Performance:** Uso de `OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF` e chaves primárias bem definidas (Primary Key Clustered) para garantir a eficiência das junções.
+- **Tratamento de Dados:** Conversão segura de tipos de dados durante a análise, como a substituição de vírgulas e casting numérico utilizando `CAST(REPLACE(valor, ',', '.') AS decimal(18,4))`.
 
-📊 Insights e Consultas Analíticas (Business Questions)
-Com a camada Gold estabelecida, o projeto responde a perguntas cruciais de negócios, demonstrando fluência em manipulação de dados para BI:
+## ⚙️ Como Executar
 
-Quais são os Top 10 Órgãos Superiores com maior valor pago em um mês específico?
+1. Clone este repositório em sua máquina local.
+2. Certifique-se de ter uma instância do SQL Server configurada.
+3. Altere os caminhos dos arquivos `.csv` nos comandos `BULK INSERT` do script para refletir o seu diretório local.
+4. Execute os scripts SQL sequencialmente (Criação de Tabelas -> Ingestão Bronze -> Transformação Silver -> Carga Gold).
 
-Qual é o valor total empenhado consolidado por Gestão no trimestre?
+---
 
-Qual é a Variação Percentual (MoM) do valor empenhado de um mês para o outro por Unidade Gestora?
-
-💡 Destaques do Código
-Performance: Uso de OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF e chaves primárias bem definidas (Primary Key Clustered) para garantir a eficiência das junções.
-
-Tratamento de Dados: Conversão segura de tipos de dados durante a análise, como a substituição de vírgulas e casting para decimal(18,4) (CAST(REPLACE(valor, ',', '.') AS decimal...)).
-
-⚙️ Como Executar
-Clone o repositório.
-
-Certifique-se de ter um ambiente SQL Server configurado.
-
-Altere os caminhos dos arquivos CSV nos comandos BULK INSERT para refletir o diretório local da sua máquina.
-
-Execute os blocos do notebook sequencialmente.
+**Desenvolvido por:** [Letícia Costa](https://github.com/dev-leticia-costa)
 
 Autor(a): Letícia Costa
 
